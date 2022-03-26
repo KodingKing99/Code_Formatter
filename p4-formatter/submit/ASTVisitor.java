@@ -26,9 +26,9 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override public Node visitProgram(CminusParser.ProgramContext ctx) {
         symbolTable = new SymbolTable();
         List<Declaration> decls = new ArrayList<>();
-//        for (CminusParser.DeclarationContext d : ctx.declaration()) {
-//            decls.add((Declaration) visitDeclaration(d));
-//        }
+       for (CminusParser.DeclarationContext d : ctx.declaration()) {
+           decls.add((Declaration) visitDeclaration(d));
+       }
         return new Program(decls);
     }
 
@@ -37,23 +37,22 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
             String id = v.ID().getText();
             LOGGER.fine("Var ID: " + id);
         }
-        return null;
-
-//        VarType type = getVarType(ctx.typeSpecifier());
-//        List<String> ids = new ArrayList<>();
-//        List<Integer> arraySizes = new ArrayList<>();
-//        for (CminusParser.VarDeclIdContext v : ctx.varDeclId()) {
-//            String id = v.ID().getText();
-//            ids.add(id);
-//            symbolTable.addSymbol(id, new SymbolInfo(id, type, false));
-//            if (v.NUMCONST() != null) {
-//                arraySizes.add(Integer.parseInt(v.NUMCONST().getText()));
-//            } else {
-//                arraySizes.add(-1);
-//            }
-//        }
-//        final boolean isStatic = false;
-//        return new VarDeclaration(type, ids, arraySizes, isStatic);
+        // return null;
+       VarType type = getVarType(ctx.typeSpecifier());
+       List<String> ids = new ArrayList<>();
+       List<Integer> arraySizes = new ArrayList<>();
+       for (CminusParser.VarDeclIdContext v : ctx.varDeclId()) {
+           String id = v.ID().getText();
+           ids.add(id);
+           symbolTable.addSymbol(id, new SymbolInfo(id, type, false));
+           if (v.NUMCONST() != null) {
+               arraySizes.add(Integer.parseInt(v.NUMCONST().getText()));
+           } else {
+               arraySizes.add(-1);
+           }
+       }
+       final boolean isStatic = false;
+       return new VarDeclaration(type, ids, arraySizes, isStatic);
     }
 
 //    @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
