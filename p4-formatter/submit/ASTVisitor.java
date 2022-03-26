@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import parser.CminusBaseVisitor;
 import parser.CminusParser;
+import parser.CminusParser.FunDeclarationContext;
+import parser.CminusParser.ParamContext;
 import submit.ast.*;
 
 import java.util.ArrayList;
@@ -22,7 +24,10 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         final String t = ctx.getText();
         return (t.equals("int")) ? VarType.INT : (t.equals("bool")) ? VarType.BOOL : VarType.CHAR;
     }
-
+    private FunType getFunType(CminusParser.TypeSpecifierContext ctx) {
+        final String t = ctx.getText();
+        return (t.equals("void")) ? FunType.VOID : (t.equals("int")) ? FunType.INT : (t.equals("bool")) ? FunType.BOOL : FunType.CHAR;
+    }
     @Override public Node visitProgram(CminusParser.ProgramContext ctx) {
         symbolTable = new SymbolTable();
         List<Declaration> decls = new ArrayList<>();
@@ -54,7 +59,31 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
        final boolean isStatic = false;
        return new VarDeclaration(type, ids, arraySizes, isStatic);
     }
-
+    @Override
+    public Node visitFunDeclaration(FunDeclarationContext ctx) {
+        // TODO Auto-generated method stub
+        String funText = ctx.getText();
+        LOGGER.fine(funText);
+        String funId = ctx.ID().getText();
+        LOGGER.fine("Function ID: " + funId);
+        FunType type = getFunType(ctx.typeSpecifier());
+        LOGGER.fine("Type is: " + type.toString());
+        List<Parameter> params = new ArrayList<>();
+        for(CminusParser.ParamContext p :  ctx.param()){
+            VarType paramType = getVarType(p.typeSpecifier());
+            String paramId = p.paramId().getText();
+            params.add(new Parameter(paramType, paramId));
+        }
+        LOGGER.fine("Params are: ");
+        for(Parameter parameter : params){
+            LOGGER.fine(parameter.toString());
+        }
+        return super.visitFunDeclaration(ctx);
+    }
+    @Override
+    public Node visitParam(ParamContext ctx){
+        return super.visitParam(ctx);
+    }
 //    @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
 //        if (ctx.expression() != null) {
 //            return new Return((Expression) visitExpression(ctx.expression()));
@@ -76,7 +105,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
 //        return node;
 //    }
 
-    // TODO Uncomment and implement whatever methods make sense
+    // TODO implement whatever methods make sense
 //    /**
 //     * {@inheritDoc}
 //     *
