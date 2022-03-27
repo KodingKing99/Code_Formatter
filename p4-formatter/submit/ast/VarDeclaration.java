@@ -43,5 +43,4 @@ public class VarDeclaration implements Declaration, Node {
     builder.delete(builder.length() - 2, builder.length());
     builder.append(";\n");
   }
-
 }
