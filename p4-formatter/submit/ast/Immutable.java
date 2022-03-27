@@ -29,6 +29,11 @@ public class Immutable implements Expression, Node{
         else if(constant != null){
             constant.toCminus(builder, prefix);
         }
+        else if(this.expression != null){
+            builder.append("(");
+            this.expression.toCminus(builder, "");
+            builder.append(")");
+        }
     }
     @Override
     public String toString() {

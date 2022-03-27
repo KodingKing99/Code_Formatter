@@ -142,6 +142,9 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         // String s = ctx.getText();
         // LOGGER.fine("In visit Statment, text is: " + s);
         // visitExpressionStmt(ctx.expressionStmt());
+        if(ctx.expressionStmt() != null){
+            return visitExpressionStmt(ctx.expressionStmt());
+        }
         return super.visitStatement(ctx);
     }
 
@@ -165,15 +168,6 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         return new CompoundStatement(decls, stmts);
     }
 
-    @Override
-    public Node visitOrExpression(OrExpressionContext ctx) {
-        // TODO Auto-generated method stub
-        for (AndExpressionContext andCtx : ctx.andExpression()) {
-            // visitAndExpression(andCtx);
-            // andCtx.
-        }
-        return super.visitOrExpression(ctx);
-    }
 
     @Override
     public Node visitCall(CallContext ctx) {
@@ -191,25 +185,68 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitExpressionStmt(ExpressionStmtContext ctx) {
         // TODO Auto-generated method stub
-        return super.visitExpressionStmt(ctx);
+        if(ctx.expression() != null){
+            return new ExpressionStmt((Expression) visitExpression(ctx.expression()));
+        }
+        else{
+            return new ExpressionStmt();
+        }
     }
 
     @Override
     public Node visitExpression(ExpressionContext ctx) {
         // TODO Auto-generated method stub
-        return super.visitExpression(ctx);
-    }
-
-    @Override
-    public Node visitAndExpression(AndExpressionContext ctx) {
-        // TODO Auto-generated method stub
-        return super.visitAndExpression(ctx);
+        // return visitSimpleExpression()
+        if(ctx.simpleExpression() != null){
+            return visitSimpleExpression(ctx.simpleExpression());
+        }
+        else{
+            return super.visitExpression(ctx);
+        }
     }
 
     @Override
     public Node visitSimpleExpression(SimpleExpressionContext ctx) {
-        // TODO Auto-generated method stub
-        return super.visitSimpleExpression(ctx);
+        return visitOrExpression(ctx.orExpression());
+    }
+
+    @Override
+    public Node visitOrExpression(OrExpressionContext ctx) {
+        List<BinaryOperatorType> binaryOperatorTypes = new ArrayList<>();
+        List<Expression> andExpressions = new ArrayList<>();
+        for (AndExpressionContext orExCtx : ctx.andExpression()) {
+            andExpressions.add((Expression) visitAndExpression(orExCtx));
+        }
+        for(int i = 0; i < andExpressions.size() - 1; i++){
+            binaryOperatorTypes.add(BinaryOperatorType.fromString("||"));
+        }
+        if (binaryOperatorTypes.size() > 0) {
+            BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, andExpressions);
+            LOGGER.fine("In Or expression. Binary op is: " + bn.toString());
+            return new RelExpression(bn);
+        } else {
+            return new RelExpression(andExpressions.get(0));
+        }
+    }
+
+    @Override
+    public Node visitAndExpression(AndExpressionContext ctx) {
+        List<BinaryOperatorType> binaryOperatorTypes = new ArrayList<>();
+        List<Expression> sumExpressions = new ArrayList<>();
+        for (UnaryRelExpressionContext unRelCtx : ctx.unaryRelExpression()) {
+            sumExpressions.add((Expression) visitUnaryRelExpression(unRelCtx));
+        }
+        for(int i = 0; i < sumExpressions.size() - 1; i++){
+            binaryOperatorTypes.add(BinaryOperatorType.fromString("&&"));
+        }
+        if (binaryOperatorTypes.size() > 0) {
+            BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, sumExpressions);
+            LOGGER.fine("In And expression. Binary op is: " + bn.toString());
+            return new RelExpression(bn);
+        } else {
+            return new RelExpression(sumExpressions.get(0));
+        }
+        // return super.visitAndExpression(ctx);
     }
 
     @Override
