@@ -9,6 +9,7 @@ import parser.CminusParser.CallContext;
 import parser.CminusParser.CompoundStmtContext;
 import parser.CminusParser.ExpressionContext;
 import parser.CminusParser.ExpressionStmtContext;
+import parser.CminusParser.FactorContext;
 import parser.CminusParser.FunDeclarationContext;
 import parser.CminusParser.ImmutableContext;
 import parser.CminusParser.MutableContext;
@@ -180,6 +181,16 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     public Node visitRelExpression(RelExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitRelExpression(ctx);
+    }
+    @Override
+    public Node visitFactor(FactorContext ctx) {
+        if(ctx.mutable() != null){
+            return new Factor((Mutable) visitMutable(ctx.mutable()));
+        }
+        else if (ctx.immutable() != null){
+            return new Factor((Immutable) visitImmutable(ctx.immutable()));
+        }
+        return super.visitFactor(ctx);
     }
     @Override
     public Node visitImmutable(ImmutableContext ctx) {
