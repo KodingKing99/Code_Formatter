@@ -18,7 +18,9 @@ import parser.CminusParser.ParamContext;
 import parser.CminusParser.RelExpressionContext;
 import parser.CminusParser.SimpleExpressionContext;
 import parser.CminusParser.StatementContext;
+import parser.CminusParser.UnaryExpressionContext;
 import parser.CminusParser.UnaryRelExpressionContext;
+import parser.CminusParser.UnaryopContext;
 import parser.CminusParser.VarDeclarationContext;
 import submit.ast.*;
 
@@ -44,7 +46,10 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         return (t.equals("void")) ? FunType.VOID
                 : (t.equals("int")) ? FunType.INT : (t.equals("bool")) ? FunType.BOOL : FunType.CHAR;
     }
-
+    // private UnaryOperatorType getUnaryOperatorType(CminusParser.UnaryopContext ctx){
+        // ctx.
+        // final String t = ctx.getText()
+    // }
     @Override
     public Node visitProgram(CminusParser.ProgramContext ctx) {
         symbolTable = new SymbolTable();
@@ -183,14 +188,28 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         return super.visitRelExpression(ctx);
     }
     @Override
+    public Node visitUnaryop(UnaryopContext ctx) {
+        String operator = ctx.getText();
+        return new UnaryOperator(operator);
+    }
+    @Override
+    public Node visitUnaryExpression(UnaryExpressionContext ctx) {
+        List<UnaryOperator> unaryOperators = new ArrayList<>();
+        for(UnaryopContext unOpCtx : ctx.unaryop()){
+            unaryOperators.add((UnaryOperator) visitUnaryop(unOpCtx));
+        }
+        Factor factor = (Factor) visitFactor(ctx.factor());
+        return new UnaryExpression(unaryOperators, factor);
+    }
+    @Override
     public Node visitFactor(FactorContext ctx) {
         if(ctx.mutable() != null){
             return new Factor((Mutable) visitMutable(ctx.mutable()));
         }
-        else if (ctx.immutable() != null){
+        else{ //if (ctx.immutable() != null){
             return new Factor((Immutable) visitImmutable(ctx.immutable()));
         }
-        return super.visitFactor(ctx);
+        // return super.visitFactor(ctx);
     }
     @Override
     public Node visitImmutable(ImmutableContext ctx) {
