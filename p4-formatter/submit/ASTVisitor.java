@@ -83,8 +83,8 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         // TODO Auto-generated method stub
         String funText = ctx.getText();
         LOGGER.fine(funText);
-        String funId = ctx.ID().getText();
-        LOGGER.fine("Function ID: " + funId);
+        String funName = ctx.ID().getText();
+        LOGGER.fine("Function ID: " + funName);
         FunType type = getFunType(ctx.typeSpecifier());
         LOGGER.fine("Type is: " + type.toString());
         List<Parameter> params = new ArrayList<>();
@@ -97,9 +97,9 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         for (Parameter parameter : params) {
             LOGGER.fine(parameter.toString());
         }
-        visitCompoundStmt(ctx.statement().compoundStmt());
-
-        return super.visitFunDeclaration(ctx);
+        CompoundStatement compoundStatement = ((CompoundStatement) visitCompoundStmt(ctx.statement().compoundStmt()));
+        return new FunDecleration(type, funName, params, compoundStatement, false);
+        // return super.visitFunDeclaration(ctx);
     }
 
     @Override
@@ -119,17 +119,16 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitCompoundStmt(CompoundStmtContext ctx) {
         // TODO Auto-generated method stub
-        // List<VarDeclaration> decls = new ArrayList<>();
-        // List<Statement> stmts = new ArrayList<>();
-        List<Node> leafs = new ArrayList<>();
+        List<VarDeclaration> decls = new ArrayList<>();
+        List<Statement> stmts = new ArrayList<>();
         for (VarDeclarationContext declCtx : ctx.varDeclaration()) {
-            leafs.add(visitVarDeclaration(declCtx));
+            decls.add((VarDeclaration) visitVarDeclaration(declCtx));
         }
         for (StatementContext stmtCtx : ctx.statement()) {
-            visitStatement(stmtCtx);
+            stmts.add((Statement) visitStatement(stmtCtx));
         }
-        return super.visitCompoundStmt(ctx);
-        // return new CompoundStatement(leafs);
+        // return super.visitCompoundStmt(ctx);
+        return new CompoundStatement(decls, stmts);
     }
     @Override
     public Node visitOrExpression(OrExpressionContext ctx) {
