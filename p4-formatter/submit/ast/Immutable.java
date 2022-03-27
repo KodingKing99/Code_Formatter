@@ -27,7 +27,14 @@ public class Immutable implements Expression, Node{
             call.toCminus(builder, prefix);
         }
         else if(constant != null){
-            // constant.toCminus();
+            constant.toCminus(builder, prefix);
         }
+    }
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        String prefix = "";
+        this.toCminus(builder, prefix);
+        return builder.toString();
     }
 }

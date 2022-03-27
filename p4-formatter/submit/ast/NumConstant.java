@@ -8,7 +8,7 @@ package submit.ast;
  *
  * @author edwajohn
  */
-public class NumConstant extends Constant implements Expression, Node {
+public class NumConstant implements Constant {
 
   private final int value;
 
@@ -16,6 +16,7 @@ public class NumConstant extends Constant implements Expression, Node {
     this.value = value;
   }
 
+  @Override
   public void toCminus(StringBuilder builder, final String prefix) {
     builder.append(Integer.toString(value));
   }

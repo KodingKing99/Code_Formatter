@@ -12,12 +12,14 @@ import parser.CminusParser.ExpressionStmtContext;
 import parser.CminusParser.FactorContext;
 import parser.CminusParser.FunDeclarationContext;
 import parser.CminusParser.ImmutableContext;
+import parser.CminusParser.MulopContext;
 import parser.CminusParser.MutableContext;
 import parser.CminusParser.OrExpressionContext;
 import parser.CminusParser.ParamContext;
 import parser.CminusParser.RelExpressionContext;
 import parser.CminusParser.SimpleExpressionContext;
 import parser.CminusParser.StatementContext;
+import parser.CminusParser.TermExpressionContext;
 import parser.CminusParser.UnaryExpressionContext;
 import parser.CminusParser.UnaryRelExpressionContext;
 import parser.CminusParser.UnaryopContext;
@@ -46,10 +48,12 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         return (t.equals("void")) ? FunType.VOID
                 : (t.equals("int")) ? FunType.INT : (t.equals("bool")) ? FunType.BOOL : FunType.CHAR;
     }
-    // private UnaryOperatorType getUnaryOperatorType(CminusParser.UnaryopContext ctx){
-        // ctx.
-        // final String t = ctx.getText()
-    // }
+
+    private BinaryOperatorType getBiOpType(CminusParser.MulopContext ctx) {
+        final String t = ctx.getText();
+        return BinaryOperatorType.fromString(t);
+    }
+
     @Override
     public Node visitProgram(CminusParser.ProgramContext ctx) {
         symbolTable = new SymbolTable();
@@ -113,7 +117,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         // TODO Auto-generated method stub
         // String s = ctx.getText();
         // LOGGER.fine("In visit Statment, text is: " + s);
-        // visitExpressionStmt(ctx.expressionStmt()); 
+        // visitExpressionStmt(ctx.expressionStmt());
         return super.visitStatement(ctx);
     }
 
@@ -136,106 +140,146 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         // return super.visitCompoundStmt(ctx);
         return new CompoundStatement(decls, stmts);
     }
+
     @Override
     public Node visitOrExpression(OrExpressionContext ctx) {
         // TODO Auto-generated method stub
-        for(AndExpressionContext andCtx :  ctx.andExpression()){
+        for (AndExpressionContext andCtx : ctx.andExpression()) {
             // visitAndExpression(andCtx);
             // andCtx.
         }
         return super.visitOrExpression(ctx);
     }
+
     @Override
     public Node visitCall(CallContext ctx) {
         // TODO Auto-generated method stub
         LOGGER.fine("Call is: " + ctx.ID().getText());
         String id = ctx.ID().getText();
         List<Expression> exprs = new ArrayList<>();
-        for(ExpressionContext exprCtx : ctx.expression() ){
+        for (ExpressionContext exprCtx : ctx.expression()) {
             exprs.add((Expression) visitExpression(exprCtx));
         }
         return new Call(id, exprs);
         // return super.visitCall(ctx);
     }
+
     @Override
     public Node visitExpressionStmt(ExpressionStmtContext ctx) {
         // TODO Auto-generated method stub
         return super.visitExpressionStmt(ctx);
     }
+
     @Override
     public Node visitExpression(ExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitExpression(ctx);
     }
+
     @Override
     public Node visitAndExpression(AndExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitAndExpression(ctx);
     }
+
     @Override
     public Node visitSimpleExpression(SimpleExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitSimpleExpression(ctx);
     }
+
     @Override
     public Node visitUnaryRelExpression(UnaryRelExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitUnaryRelExpression(ctx);
     }
+
     @Override
     public Node visitRelExpression(RelExpressionContext ctx) {
         // TODO Auto-generated method stub
         return super.visitRelExpression(ctx);
     }
+
+    @Override
+    public Node visitTermExpression(TermExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        // ctx.mulop()
+        List<BinaryOperatorType> binaryOperatorTypes = new ArrayList<>();
+        for (MulopContext mulopContext : ctx.mulop()) {
+            binaryOperatorTypes.add(getBiOpType(mulopContext));
+        }
+        List<UnaryExpression> urnExpressions = new ArrayList<>();
+        for (UnaryExpressionContext urnContext : ctx.unaryExpression()) {
+            urnExpressions.add((UnaryExpression) visitUnaryExpression(urnContext));
+        }
+        int i = 0;
+        if (urnExpressions.size() > 1) {
+            for (int j = 1; j < urnExpressions.size(); j++) {
+                LOGGER.fine(urnExpressions.get(i).toString() + " " + binaryOperatorTypes.get(i).toString() + " "
+                        + urnExpressions.get(j).toString());
+                i++;
+            }
+        }
+
+        return super.visitTermExpression(ctx);
+    }
+
+    // @Override
+    // public Node visitMulop(MulopContext ctx) {
+    // // TODO Auto-generated method stub
+    // String text = ctx.getText();
+    // LOGGER.fine("In visitMulop. Text is: " + text);
+    // return super.visitMulop(ctx);
+    // }
     @Override
     public Node visitUnaryop(UnaryopContext ctx) {
         String operator = ctx.getText();
         return new UnaryOperator(operator);
     }
+
     @Override
     public Node visitUnaryExpression(UnaryExpressionContext ctx) {
         List<UnaryOperator> unaryOperators = new ArrayList<>();
-        for(UnaryopContext unOpCtx : ctx.unaryop()){
+        for (UnaryopContext unOpCtx : ctx.unaryop()) {
             unaryOperators.add((UnaryOperator) visitUnaryop(unOpCtx));
         }
         Factor factor = (Factor) visitFactor(ctx.factor());
         return new UnaryExpression(unaryOperators, factor);
     }
+
     @Override
     public Node visitFactor(FactorContext ctx) {
-        if(ctx.mutable() != null){
+        if (ctx.mutable() != null) {
             return new Factor((Mutable) visitMutable(ctx.mutable()));
-        }
-        else{ //if (ctx.immutable() != null){
+        } else { // if (ctx.immutable() != null){
             return new Factor((Immutable) visitImmutable(ctx.immutable()));
         }
         // return super.visitFactor(ctx);
     }
+
     @Override
     public Node visitImmutable(ImmutableContext ctx) {
         // TODO Auto-generated method stub
-        if(ctx.expression() != null){
-            // return
+        final Immutable node;
+        if (ctx.expression() != null) {
+            node = new Immutable((Expression) visitExpression(ctx.expression()));
+        } 
+        else if (ctx.call() != null) {
+            node = new Immutable((Call) visitCall(ctx.call()));
+        } else{ //if (ctx.constant() != null) {
+            node = new Immutable((Constant) visitConstant(ctx.constant()));
         }
-        else if(ctx.call() != null){
-            LOGGER.fine("In visit Immutable");
-            Node m = visitCall(ctx.call());
-            LOGGER.fine(((Call) m).toString());
-            return new Immutable((Call) visitCall(ctx.call()));
-        }
-        else if(ctx.constant() != null){
-            return new Immutable((Constant) visitConstant(ctx.constant()));
-        }
-        return super.visitImmutable(ctx);
+        // LOGGER.fine("Immutable node: " + node.toString());
+        return node;
     }
+
     @Override
     public Node visitMutable(MutableContext ctx) {
         String id = ctx.ID().getText();
-        if(ctx.expression() != null){
+        if (ctx.expression() != null) {
             Node index = visitExpression(ctx.expression());
             return new Mutable(id, (Expression) index);
-        }
-        else{
+        } else {
             return new Mutable(id, null);
         }
     }
@@ -246,20 +290,21 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     // return new Return(null);
     // }
 
-    @Override public Node visitConstant(CminusParser.ConstantContext ctx) {
-    final Node node;
-    if (ctx.NUMCONST() != null) {
-    node = new NumConstant(Integer.parseInt(ctx.NUMCONST().getText()));
-    } else if (ctx.CHARCONST() != null) {
-    node = new CharConstant(ctx.CHARCONST().getText().charAt(0));
-    } else if (ctx.STRINGCONST() != null) {
-    node = new StringConstant(ctx.STRINGCONST().getText());
-    } else {
-    node = new BoolConstant(ctx.getText().equals("true"));
+    @Override
+    public Node visitConstant(CminusParser.ConstantContext ctx) {
+        final Node node;
+        if (ctx.NUMCONST() != null) {
+            node = new NumConstant(Integer.parseInt(ctx.NUMCONST().getText()));
+        } else if (ctx.CHARCONST() != null) {
+            node = new CharConstant(ctx.CHARCONST().getText().charAt(0));
+        } else if (ctx.STRINGCONST() != null) {
+            node = new StringConstant(ctx.STRINGCONST().getText());
+        } else {
+            node = new BoolConstant(ctx.getText().equals("true"));
+        }
+        return node;
     }
-    return node;
-    }
-    
+
     // TODO implement whatever methods make sense
     // /**
     // * {@inheritDoc}

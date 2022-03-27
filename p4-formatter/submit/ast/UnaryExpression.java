@@ -15,7 +15,13 @@ public class UnaryExpression implements Expression{
         for(UnaryOperator uOperator : this.unaryOperators){
             uOperator.toCminus(builder, "");
         }
-        builder.append(" ");
         factor.toCminus(builder, "");
+    }
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        String prefix = "";
+        this.toCminus(builder, prefix);
+        return builder.toString();
     }
 }

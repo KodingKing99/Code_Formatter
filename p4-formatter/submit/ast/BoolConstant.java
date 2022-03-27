@@ -8,7 +8,7 @@ package submit.ast;
  *
  * @author edwajohn
  */
-public class BoolConstant extends Constant implements Expression {
+public class BoolConstant implements Constant {
 
   private final boolean value;
 
@@ -16,6 +16,7 @@ public class BoolConstant extends Constant implements Expression {
     this.value = value;
   }
 
+  @Override
   public void toCminus(StringBuilder builder, final String prefix) {
     if (value) {
       builder.append("true");

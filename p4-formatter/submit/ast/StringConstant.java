@@ -8,7 +8,7 @@ package submit.ast;
  *
  * @author edwajohn
  */
-public class StringConstant extends Constant implements Expression{
+public class StringConstant implements Constant{
 
   private final String value;
 

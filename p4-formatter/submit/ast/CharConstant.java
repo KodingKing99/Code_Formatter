@@ -8,7 +8,7 @@ package submit.ast;
  *
  * @author edwajohn
  */
-public class CharConstant extends Constant implements Expression {
+public class CharConstant implements Constant {
 
   private final char value;
 
