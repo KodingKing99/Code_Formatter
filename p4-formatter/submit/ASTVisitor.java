@@ -11,6 +11,7 @@ import parser.CminusParser.ExpressionContext;
 import parser.CminusParser.ExpressionStmtContext;
 import parser.CminusParser.FunDeclarationContext;
 import parser.CminusParser.ImmutableContext;
+import parser.CminusParser.MutableContext;
 import parser.CminusParser.OrExpressionContext;
 import parser.CminusParser.ParamContext;
 import parser.CminusParser.RelExpressionContext;
@@ -143,8 +144,12 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     public Node visitCall(CallContext ctx) {
         // TODO Auto-generated method stub
         LOGGER.fine("Call is: " + ctx.ID().getText());
-        String id = ctx.ID().getText() ;
-        return new Call(id);
+        String id = ctx.ID().getText();
+        List<Expression> exprs = new ArrayList<>();
+        for(ExpressionContext exprCtx : ctx.expression() ){
+            exprs.add((Expression) visitExpression(exprCtx));
+        }
+        return new Call(id, exprs);
         // return super.visitCall(ctx);
     }
     @Override
@@ -189,7 +194,21 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
             LOGGER.fine(((Call) m).toString());
             return new Immutable((Call) visitCall(ctx.call()));
         }
+        else if(ctx.constant() != null){
+            return new Immutable((Constant) visitConstant(ctx.constant()));
+        }
         return super.visitImmutable(ctx);
+    }
+    @Override
+    public Node visitMutable(MutableContext ctx) {
+        String id = ctx.ID().getText();
+        if(ctx.expression() != null){
+            Node index = visitExpression(ctx.expression());
+            return new Mutable(id, (Expression) index);
+        }
+        else{
+            return new Mutable(id, null);
+        }
     }
     // @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
     // if (ctx.expression() != null) {
@@ -211,7 +230,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     }
     return node;
     }
-
+    
     // TODO implement whatever methods make sense
     // /**
     // * {@inheritDoc}
