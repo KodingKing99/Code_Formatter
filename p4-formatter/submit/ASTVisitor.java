@@ -5,12 +5,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import parser.CminusBaseVisitor;
 import parser.CminusParser;
 import parser.CminusParser.AndExpressionContext;
+import parser.CminusParser.CallContext;
 import parser.CminusParser.CompoundStmtContext;
+import parser.CminusParser.ExpressionContext;
 import parser.CminusParser.ExpressionStmtContext;
 import parser.CminusParser.FunDeclarationContext;
+import parser.CminusParser.ImmutableContext;
 import parser.CminusParser.OrExpressionContext;
 import parser.CminusParser.ParamContext;
+import parser.CminusParser.RelExpressionContext;
+import parser.CminusParser.SimpleExpressionContext;
 import parser.CminusParser.StatementContext;
+import parser.CminusParser.UnaryRelExpressionContext;
 import parser.CminusParser.VarDeclarationContext;
 import submit.ast.*;
 
@@ -100,7 +106,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         // TODO Auto-generated method stub
         // String s = ctx.getText();
         // LOGGER.fine("In visit Statment, text is: " + s);
-        visitExpressionStmt(ctx.expressionStmt()); 
+        // visitExpressionStmt(ctx.expressionStmt()); 
         return super.visitStatement(ctx);
     }
 
@@ -133,6 +139,58 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         return super.visitOrExpression(ctx);
     }
+    @Override
+    public Node visitCall(CallContext ctx) {
+        // TODO Auto-generated method stub
+        LOGGER.fine("Call is: " + ctx.ID().getText());
+        String id = ctx.ID().getText() ;
+        return new Call(id);
+        // return super.visitCall(ctx);
+    }
+    @Override
+    public Node visitExpressionStmt(ExpressionStmtContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitExpressionStmt(ctx);
+    }
+    @Override
+    public Node visitExpression(ExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitExpression(ctx);
+    }
+    @Override
+    public Node visitAndExpression(AndExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitAndExpression(ctx);
+    }
+    @Override
+    public Node visitSimpleExpression(SimpleExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitSimpleExpression(ctx);
+    }
+    @Override
+    public Node visitUnaryRelExpression(UnaryRelExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitUnaryRelExpression(ctx);
+    }
+    @Override
+    public Node visitRelExpression(RelExpressionContext ctx) {
+        // TODO Auto-generated method stub
+        return super.visitRelExpression(ctx);
+    }
+    @Override
+    public Node visitImmutable(ImmutableContext ctx) {
+        // TODO Auto-generated method stub
+        if(ctx.expression() != null){
+            // return
+        }
+        else if(ctx.call() != null){
+            LOGGER.fine("In visit Immutable");
+            Node m = visitCall(ctx.call());
+            LOGGER.fine(((Call) m).toString());
+            return new Immutable((Call) visitCall(ctx.call()));
+        }
+        return super.visitImmutable(ctx);
+    }
     // @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
     // if (ctx.expression() != null) {
     // return new Return((Expression) visitExpression(ctx.expression()));
@@ -140,19 +198,19 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     // return new Return(null);
     // }
 
-    // @Override public Node visitConstant(CminusParser.ConstantContext ctx) {
-    // final Node node;
-    // if (ctx.NUMCONST() != null) {
-    // node = new NumConstant(Integer.parseInt(ctx.NUMCONST().getText()));
-    // } else if (ctx.CHARCONST() != null) {
-    // node = new CharConstant(ctx.CHARCONST().getText().charAt(0));
-    // } else if (ctx.STRINGCONST() != null) {
-    // node = new StringConstant(ctx.STRINGCONST().getText());
-    // } else {
-    // node = new BoolConstant(ctx.getText().equals("true"));
-    // }
-    // return node;
-    // }
+    @Override public Node visitConstant(CminusParser.ConstantContext ctx) {
+    final Node node;
+    if (ctx.NUMCONST() != null) {
+    node = new NumConstant(Integer.parseInt(ctx.NUMCONST().getText()));
+    } else if (ctx.CHARCONST() != null) {
+    node = new CharConstant(ctx.CHARCONST().getText().charAt(0));
+    } else if (ctx.STRINGCONST() != null) {
+    node = new StringConstant(ctx.STRINGCONST().getText());
+    } else {
+    node = new BoolConstant(ctx.getText().equals("true"));
+    }
+    return node;
+    }
 
     // TODO implement whatever methods make sense
     // /**
