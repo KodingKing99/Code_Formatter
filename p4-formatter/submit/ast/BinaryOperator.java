@@ -32,4 +32,11 @@ public class BinaryOperator implements Expression {
     rhs.toCminus(builder, prefix);
   }
 
+  @Override
+  public String toString() {
+      StringBuilder builder = new StringBuilder();
+      String prefix = "";
+      this.toCminus(builder, prefix);
+      return builder.toString();
+  }
 }

@@ -1,15 +1,13 @@
 package submit.ast;
 
-import java.util.List;
-
-public class TermExpression implements Expression {
+public class SumExpression implements Expression{
     private final Expression unaryExpression;
     private final BinaryOperator binaryOperation;
-    public TermExpression(Expression unaryExpression){
+    public SumExpression(Expression unaryExpression){
         this.unaryExpression = unaryExpression;
         this.binaryOperation = null;
     }
-    public TermExpression(BinaryOperator binaryOperation){
+    public SumExpression(BinaryOperator binaryOperation){
         this.unaryExpression = null;
         this.binaryOperation = binaryOperation;
     }
