@@ -17,6 +17,7 @@ import parser.CminusParser.MutableContext;
 import parser.CminusParser.OrExpressionContext;
 import parser.CminusParser.ParamContext;
 import parser.CminusParser.RelExpressionContext;
+import parser.CminusParser.RelopContext;
 import parser.CminusParser.SimpleExpressionContext;
 import parser.CminusParser.StatementContext;
 import parser.CminusParser.SumExpressionContext;
@@ -55,20 +56,28 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         final String t = ctx.getText();
         return BinaryOperatorType.fromString(t);
     }
+
     private BinaryOperatorType getBiOpType(CminusParser.SumopContext ctx) {
         final String t = ctx.getText();
         return BinaryOperatorType.fromString(t);
     }
-    private BinaryOperator computeBinaryOperator(List<BinaryOperatorType> types, List<Expression> exprs){
+
+    private BinaryOperatorType getBiOpType(CminusParser.RelopContext ctx) {
+        final String t = ctx.getText();
+        return BinaryOperatorType.fromString(t);
+    }
+
+    private BinaryOperator computeBinaryOperator(List<BinaryOperatorType> types, List<Expression> exprs) {
         int index = types.size() - 1;
         BinaryOperator bo = new BinaryOperator(exprs.get(index), types.get(index), exprs.get(index + 1));
         index -= 1;
-        while(index > 0){
+        while (index > 0) {
             bo = new BinaryOperator(exprs.get(index), types.get(index), bo);
             index -= 1;
         }
         return bo;
     }
+
     @Override
     public Node visitProgram(CminusParser.ProgramContext ctx) {
         symbolTable = new SymbolTable();
@@ -205,15 +214,33 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
 
     @Override
     public Node visitUnaryRelExpression(UnaryRelExpressionContext ctx) {
-        // TODO Auto-generated method stub
-        return super.visitUnaryRelExpression(ctx);
+        List<String> bangs = new ArrayList<>();
+        for (TerminalNode term : ctx.BANG()) {
+            bangs.add(term.getText());
+        }
+        RelExpression relExpression = (RelExpression) visitRelExpression(ctx.relExpression());
+        return new UnaryRelExpression(relExpression, bangs);
     }
 
     @Override
     public Node visitRelExpression(RelExpressionContext ctx) {
-        // TODO Auto-generated method stub
-        return super.visitRelExpression(ctx);
+        List<BinaryOperatorType> binaryOperatorTypes = new ArrayList<>();
+        for (RelopContext mulopContext : ctx.relop()) {
+            binaryOperatorTypes.add(getBiOpType(mulopContext));
+        }
+        List<Expression> sumExpressions = new ArrayList<>();
+        for (SumExpressionContext sumContext : ctx.sumExpression()) {
+            sumExpressions.add((Expression) visitSumExpression(sumContext));
+        }
+        if (binaryOperatorTypes.size() > 0) {
+            BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, sumExpressions);
+            // LOGGER.fine("In sum expression. Binary op is: " + bn.toString());
+            return new RelExpression(bn);
+        } else {
+            return new RelExpression(sumExpressions.get(0));
+        }
     }
+
     @Override
     public Node visitSumExpression(SumExpressionContext ctx) {
         List<BinaryOperatorType> binaryOperatorTypes = new ArrayList<>();
@@ -224,15 +251,15 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         for (TermExpressionContext termContext : ctx.termExpression()) {
             termExpressions.add((Expression) visitTermExpression(termContext));
         }
-        if(binaryOperatorTypes.size() > 0){
+        if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, termExpressions);
-            LOGGER.fine("In term expression. Binary op is: " + bn.toString());
+            LOGGER.fine("In sum expression. Binary op is: " + bn.toString());
             return new SumExpression(bn);
-        }
-        else{
+        } else {
             return new SumExpression(termExpressions.get(0));
         }
     }
+
     @Override
     public Node visitTermExpression(TermExpressionContext ctx) {
         // TODO Auto-generated method stub
@@ -245,12 +272,11 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         for (UnaryExpressionContext urnContext : ctx.unaryExpression()) {
             urnExpressions.add((Expression) visitUnaryExpression(urnContext));
         }
-        if(binaryOperatorTypes.size() > 0){
+        if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, urnExpressions);
             LOGGER.fine("In term expression. Binary op is: " + bn.toString());
             return new TermExpression(bn);
-        }
-        else{
+        } else {
             return new TermExpression(urnExpressions.get(0));
         }
     }
@@ -294,10 +320,9 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         final Immutable node;
         if (ctx.expression() != null) {
             node = new Immutable((Expression) visitExpression(ctx.expression()));
-        } 
-        else if (ctx.call() != null) {
+        } else if (ctx.call() != null) {
             node = new Immutable((Call) visitCall(ctx.call()));
-        } else{ //if (ctx.constant() != null) {
+        } else { // if (ctx.constant() != null) {
             node = new Immutable((Constant) visitConstant(ctx.constant()));
         }
         // LOGGER.fine("Immutable node: " + node.toString());
