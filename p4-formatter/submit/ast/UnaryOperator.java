@@ -8,7 +8,7 @@ public class UnaryOperator implements Expression{
     }
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
-        builder.append(prefix);
+        // builder.append(prefix);
         builder.append(operator);
     }
 }

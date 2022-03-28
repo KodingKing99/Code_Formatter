@@ -15,13 +15,14 @@ public class CompoundStatement implements Statement {
 
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
+        builder.append(prefix);
         builder.append("{\n");
         for (VarDeclaration decl : this.decls) {
-            decl.toCminus(builder, "\t");
+            decl.toCminus(builder, "  ");
         }
         for (Statement stmt : this.stmts) {
-            stmt.toCminus(builder, "\t");
+            stmt.toCminus(builder, "  ");
         }
-        builder.append("}");
+        builder.append("}\n");
     }
 }

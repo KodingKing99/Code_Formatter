@@ -28,6 +28,7 @@ public class FunDecleration implements Declaration, Node {
     public void toCminus(StringBuilder builder, String prefix) {
         // TODO Auto-generated method stub
         builder.append(prefix);
+        builder.append("\n");
         if (this.isStatic) {
             builder.append("static ");
         }
@@ -41,8 +42,8 @@ public class FunDecleration implements Declaration, Node {
             }
             builder.delete(builder.length() - 2, builder.length());
         }
-        builder.append(")");
+        builder.append(")\n");
         this.compoundStatement.toCminus(builder, "");
-
+        builder.append("\n");
     }
 }

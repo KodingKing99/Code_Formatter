@@ -11,7 +11,7 @@ public class UnaryRelExpression implements Expression {
     }
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
-        builder.append(prefix);
+        // builder.append(prefix);
         for(String bang : this.bangs){
             builder.append((bang));
         }

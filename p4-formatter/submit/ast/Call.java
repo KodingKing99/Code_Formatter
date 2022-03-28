@@ -12,7 +12,7 @@ public class Call implements Statement{
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
         // TODO Auto-generated method stub
-        builder.append(prefix);
+        // builder.append(prefix);
         builder.append(id).append("(");
         for(Expression expr : this.exprs){
             expr.toCminus(builder, "");
