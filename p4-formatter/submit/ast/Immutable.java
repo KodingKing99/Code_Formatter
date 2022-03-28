@@ -31,7 +31,7 @@ public class Immutable implements Expression, Node{
         }
         else if(this.expression != null){
             builder.append("(");
-            this.expression.toCminus(builder, "");
+            this.expression.toCminus(builder, prefix);
             builder.append(")");
         }
     }

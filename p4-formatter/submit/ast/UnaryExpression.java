@@ -13,9 +13,9 @@ public class UnaryExpression implements Expression{
     public void toCminus(StringBuilder builder, String prefix) {
         // TODO Auto-generated method stub
         for(UnaryOperator uOperator : this.unaryOperators){
-            uOperator.toCminus(builder, "");
+            uOperator.toCminus(builder, prefix);
         }
-        factor.toCminus(builder, "");
+        factor.toCminus(builder, prefix);
     }
     @Override
     public String toString() {

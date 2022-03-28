@@ -13,7 +13,7 @@ public class IfStmt implements Statement{
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix);
-        builder.append("if(");
+        builder.append("if (");
         this.simpleExpression.toCminus(builder, "");
         builder.append(")\n");
         this.statements.get(0).toCminus(builder, prefix);

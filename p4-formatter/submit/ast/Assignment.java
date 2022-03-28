@@ -17,13 +17,18 @@ public class Assignment implements Expression{
     }
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
+
+        System.out.println("In assignment to cminus. prefix length: " + prefix.length() + " . Mutable is " + this.mutable.toString());
         builder.append(prefix);
-        this.mutable.toCminus(builder, "");
-        builder.append(" ").append(this.operator);
+        this.mutable.toCminus(builder, prefix);
+        
         if(this.expression != null){
-            builder.append(" ");
+            builder.append(" ").append(this.operator).append(" ");
             this.expression.toCminus(builder, prefix);
         } 
+        else{
+            builder.append(this.operator);
+        }
         builder.append(";\n");
     }
 }

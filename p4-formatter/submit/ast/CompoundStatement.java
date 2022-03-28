@@ -15,14 +15,18 @@ public class CompoundStatement implements Statement {
 
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
+        String prefixCopy = prefix;
         builder.append(prefix);
         builder.append("{\n");
+        prefix += "  ";
         for (VarDeclaration decl : this.decls) {
-            decl.toCminus(builder, "  ");
+            decl.toCminus(builder, prefix);
         }
         for (Statement stmt : this.stmts) {
-            stmt.toCminus(builder, "  ");
+            stmt.toCminus(builder, prefix);
         }
+        // remove the last two spaces 
+        prefix = prefixCopy;
         builder.append(prefix).append("}\n");
     }
 }

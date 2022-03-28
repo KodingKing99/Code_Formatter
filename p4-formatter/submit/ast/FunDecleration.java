@@ -44,6 +44,6 @@ public class FunDecleration implements Declaration, Node {
         }
         builder.append(")\n");
         this.statement.toCminus(builder, "");
-        builder.append("\n");
+        // builder.append("\n");
     }
 }

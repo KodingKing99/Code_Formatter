@@ -15,6 +15,6 @@ public class UnaryRelExpression implements Expression {
         for(String bang : this.bangs){
             builder.append((bang));
         }
-        this.relExpression.toCminus(builder, "");
+        this.relExpression.toCminus(builder, prefix);
     }
 }
