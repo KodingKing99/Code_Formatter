@@ -8,11 +8,20 @@ public class WhileStmt implements Statement{
         this.statement = statement;
     }
     @Override
+    public Boolean isCompound() {
+        return false;
+    }
+    @Override
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix).append("while (");
         this.simpleExpression.toCminus(builder, prefix);
         builder.append(")\n");
+        String prefixCopy = prefix;
+        if(!this.statement.isCompound()){
+            prefix += " ";
+        }
         this.statement.toCminus(builder, prefix);
+        prefix = prefixCopy;
 
     }
 }

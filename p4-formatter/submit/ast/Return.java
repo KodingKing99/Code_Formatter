@@ -15,7 +15,10 @@ public class Return implements Statement {
   public Return(Expression expr) {
     this.expr = expr;
   }
-
+  @Override
+  public Boolean isCompound() {
+      return false;
+  }
   @Override
   public void toCminus(StringBuilder builder, String prefix) {
     builder.append(prefix);

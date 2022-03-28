@@ -25,6 +25,10 @@ public class VarDeclaration implements Declaration, Node {
     this.isStatic = isStatic;
   }
 
+  @Override
+  public Boolean isCompound() {
+      return false;
+  }
   public void toCminus(StringBuilder builder, final String prefix) {
     builder.append(prefix);
     if (isStatic) {

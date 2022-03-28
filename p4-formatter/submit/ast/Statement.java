@@ -11,4 +11,5 @@ import java.util.ArrayList;
  * @author edwajohn
  */
 public interface Statement extends Node {
+    public Boolean isCompound();
 }

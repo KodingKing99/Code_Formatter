@@ -13,6 +13,10 @@ public class Factor implements Statement{
         this.immutable = immutable;
     }
     @Override
+    public Boolean isCompound() {
+        return false;
+    }
+    @Override
     public void toCminus(StringBuilder builder, String prefix) {
         if(this.mutable != null){
             this.mutable.toCminus(builder, prefix);

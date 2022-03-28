@@ -18,6 +18,10 @@ public class Parameter implements Declaration {
         return this.type;
     }
     @Override
+    public Boolean isCompound() {
+        return false;
+    }
+    @Override
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix);
         builder.append(type.toString()).append(" ");

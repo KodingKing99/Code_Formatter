@@ -14,6 +14,11 @@ public class CompoundStatement implements Statement {
     }
 
     @Override
+    public Boolean isCompound() {
+        return true;
+    }
+
+    @Override
     public void toCminus(StringBuilder builder, String prefix) {
         String prefixCopy = prefix;
         builder.append(prefix);

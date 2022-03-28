@@ -24,11 +24,11 @@ public class Assignment implements Expression{
         
         if(this.expression != null){
             builder.append(" ").append(this.operator).append(" ");
-            this.expression.toCminus(builder, prefix);
+            this.expression.toCminus(builder, "");
         } 
         else{
             builder.append(this.operator);
         }
-        builder.append(";\n");
+        // builder.append("");
     }
 }

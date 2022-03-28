@@ -23,7 +23,10 @@ public class FunDecleration implements Declaration, Node {
         this.isStatic = isStatic;
         this.statement = statement;
     }
-
+    @Override
+    public Boolean isCompound() {
+        return false;
+    }
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
         // TODO Auto-generated method stub
