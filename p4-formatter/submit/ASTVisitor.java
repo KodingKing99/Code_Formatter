@@ -11,6 +11,7 @@ import parser.CminusParser.ExpressionContext;
 import parser.CminusParser.ExpressionStmtContext;
 import parser.CminusParser.FactorContext;
 import parser.CminusParser.FunDeclarationContext;
+import parser.CminusParser.IfStmtContext;
 import parser.CminusParser.ImmutableContext;
 import parser.CminusParser.MulopContext;
 import parser.CminusParser.MutableContext;
@@ -87,7 +88,15 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         return new Program(decls);
     }
-
+    @Override
+    public Node visitIfStmt(IfStmtContext ctx) {
+        Expression expr = (Expression) visitSimpleExpression(ctx.simpleExpression());
+        List<Statement> stmts = new ArrayList<>();
+        for(StatementContext stmtCtx : ctx.statement()){
+            stmts.add((Statement) visitStatement(stmtCtx));
+        }
+        return new IfStmt(expr, stmts);
+    }
     @Override
     public Node visitVarDeclaration(CminusParser.VarDeclarationContext ctx) {
         for (CminusParser.VarDeclIdContext v : ctx.varDeclId()) {
@@ -138,12 +147,11 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
 
     @Override
     public Node visitStatement(StatementContext ctx) {
-        // TODO Auto-generated method stub
-        // String s = ctx.getText();
-        // LOGGER.fine("In visit Statment, text is: " + s);
-        // visitExpressionStmt(ctx.expressionStmt());
         if(ctx.expressionStmt() != null){
             return visitExpressionStmt(ctx.expressionStmt());
+        }
+        else if (ctx.ifStmt() != null){
+            return visitIfStmt(ctx.ifStmt());
         }
         return super.visitStatement(ctx);
     }
@@ -197,8 +205,19 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     public Node visitExpression(ExpressionContext ctx) {
         // TODO Auto-generated method stub
         // return visitSimpleExpression()
+
         if(ctx.simpleExpression() != null){
             return visitSimpleExpression(ctx.simpleExpression());
+        }
+        else if(ctx.mutable() != null){
+            Mutable mutable = (Mutable) visitMutable(ctx.mutable());
+            String operator = ctx.children.get(1).getText();
+            // Expression expr = 
+            if(ctx.expression() != null){
+                Expression expression = (Expression) visitExpression(ctx.expression());
+                return new Assignment(mutable, operator, expression);
+            }
+            return new Assignment(mutable, operator);
         }
         else{
             return super.visitExpression(ctx);
@@ -290,7 +309,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, termExpressions);
-            LOGGER.fine("In sum expression. Binary op is: " + bn.toString());
+            // LOGGER.fine("In sum expression. Binary op is: " + bn.toString());
             return new SumExpression(bn);
         } else {
             return new SumExpression(termExpressions.get(0));
@@ -311,7 +330,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, urnExpressions);
-            LOGGER.fine("In term expression. Binary op is: " + bn.toString());
+            // LOGGER.fine("In term expression. Binary op is: " + bn.toString());
             return new TermExpression(bn);
         } else {
             return new TermExpression(urnExpressions.get(0));
@@ -362,7 +381,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         } else { // if (ctx.constant() != null) {
             node = new Immutable((Constant) visitConstant(ctx.constant()));
         }
-        // LOGGER.fine("Immutable node: " + node.toString());
+        LOGGER.fine("Immutable node: " + node.toString());
         return node;
     }
 

@@ -27,5 +27,11 @@ public class Mutable implements Expression, Node {
       builder.append("]");
     }
   }
-
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    String prefix = "";
+    this.toCminus(builder, prefix);
+    return builder.toString();
+  }
 }
