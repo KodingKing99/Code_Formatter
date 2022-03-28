@@ -13,7 +13,6 @@ public class ExpressionStmt implements Statement{
         builder.append(prefix);
         if(this.expr != null){
             this.expr.toCminus(builder, prefix);
-            // builder.append(";\n");
         }
     }
 }

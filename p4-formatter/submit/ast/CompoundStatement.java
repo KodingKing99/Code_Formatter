@@ -23,6 +23,6 @@ public class CompoundStatement implements Statement {
         for (Statement stmt : this.stmts) {
             stmt.toCminus(builder, "  ");
         }
-        builder.append("}\n");
+        builder.append(prefix).append("}\n");
     }
 }

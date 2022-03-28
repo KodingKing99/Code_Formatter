@@ -18,9 +18,10 @@ public class Assignment implements Expression{
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix);
-        this.mutable.toCminus(builder, prefix);
-        builder.append(" ").append(this.operator).append(" ");
+        this.mutable.toCminus(builder, "");
+        builder.append(" ").append(this.operator);
         if(this.expression != null){
+            builder.append(" ");
             this.expression.toCminus(builder, prefix);
         } 
         builder.append(";\n");

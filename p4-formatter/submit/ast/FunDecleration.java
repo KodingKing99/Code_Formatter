@@ -13,15 +13,15 @@ public class FunDecleration implements Declaration, Node {
     private final String funName;
     private final List<Parameter> params;
     private final Boolean isStatic;
-    private final CompoundStatement compoundStatement;
+    private final Statement statement;
 
-    public FunDecleration(FunType type, String funName, List<Parameter> params, CompoundStatement compoundStatement,
+    public FunDecleration(FunType type, String funName, List<Parameter> params, Statement statement,
             Boolean isStatic) {
         this.type = type;
         this.funName = funName;
         this.params = params;
         this.isStatic = isStatic;
-        this.compoundStatement = compoundStatement;
+        this.statement = statement;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class FunDecleration implements Declaration, Node {
             builder.delete(builder.length() - 2, builder.length());
         }
         builder.append(")\n");
-        this.compoundStatement.toCminus(builder, "");
+        this.statement.toCminus(builder, "");
         builder.append("\n");
     }
 }

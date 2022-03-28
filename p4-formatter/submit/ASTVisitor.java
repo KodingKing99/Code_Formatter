@@ -72,7 +72,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         int index = types.size() - 1;
         BinaryOperator bo = new BinaryOperator(exprs.get(index), types.get(index), exprs.get(index + 1));
         index -= 1;
-        while (index > 0) {
+        while (index >= 0) {
             bo = new BinaryOperator(exprs.get(index), types.get(index), bo);
             index -= 1;
         }
@@ -120,7 +120,12 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         final boolean isStatic = false;
         return new VarDeclaration(type, ids, arraySizes, isStatic);
     }
-
+    @Override
+    public Node visitParam(ParamContext ctx) {
+        VarType paramType = getVarType(ctx.typeSpecifier());
+        String paramId = ctx.paramId().getText();
+        return new Parameter(paramType, paramId);
+    }
     @Override
     public Node visitFunDeclaration(FunDeclarationContext ctx) {
         // TODO Auto-generated method stub
@@ -131,17 +136,15 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         FunType type = getFunType(ctx.typeSpecifier());
         LOGGER.fine("Type is: " + type.toString());
         List<Parameter> params = new ArrayList<>();
-        for (CminusParser.ParamContext p : ctx.param()) {
-            VarType paramType = getVarType(p.typeSpecifier());
-            String paramId = p.paramId().getText();
-            params.add(new Parameter(paramType, paramId));
+        for (CminusParser.ParamContext pCtx : ctx.param()) {
+            params.add((Parameter) visitParam(pCtx));
         }
         LOGGER.fine("Params are: ");
         for (Parameter parameter : params) {
             LOGGER.fine(parameter.toString());
         }
-        CompoundStatement compoundStatement = ((CompoundStatement) visitCompoundStmt(ctx.statement().compoundStmt()));
-        return new FunDecleration(type, funName, params, compoundStatement, false);
+        Statement statement = (Statement) visitStatement(ctx.statement());
+        return new FunDecleration(type, funName, params, statement, false);
         // return super.visitFunDeclaration(ctx);
     }
 
@@ -153,13 +156,13 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         else if (ctx.ifStmt() != null){
             return visitIfStmt(ctx.ifStmt());
         }
-        return super.visitStatement(ctx);
+        else if (ctx.compoundStmt() != null){
+            return visitCompoundStmt(ctx.compoundStmt());
+        }
+        else return super.visitStatement(ctx);
     }
 
-    @Override
-    public Node visitParam(ParamContext ctx) {
-        return super.visitParam(ctx);
-    }
+
 
     @Override
     public Node visitCompoundStmt(CompoundStmtContext ctx) {
