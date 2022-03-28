@@ -133,7 +133,13 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         LOGGER.fine(funText);
         String funName = ctx.ID().getText();
         LOGGER.fine("Function ID: " + funName);
-        FunType type = getFunType(ctx.typeSpecifier());
+        FunType type;
+        if(ctx.typeSpecifier() != null){
+            type = getFunType(ctx.typeSpecifier());
+        }
+        else{
+            type = FunType.VOID;
+        }
         LOGGER.fine("Type is: " + type.toString());
         List<Parameter> params = new ArrayList<>();
         for (CminusParser.ParamContext pCtx : ctx.param()) {
