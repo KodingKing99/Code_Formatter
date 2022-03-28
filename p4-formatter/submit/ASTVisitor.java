@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import parser.CminusBaseVisitor;
 import parser.CminusParser;
 import parser.CminusParser.AndExpressionContext;
+import parser.CminusParser.BreakStmtContext;
 import parser.CminusParser.CallContext;
 import parser.CminusParser.CompoundStmtContext;
 import parser.CminusParser.ExpressionContext;
@@ -28,6 +29,7 @@ import parser.CminusParser.UnaryExpressionContext;
 import parser.CminusParser.UnaryRelExpressionContext;
 import parser.CminusParser.UnaryopContext;
 import parser.CminusParser.VarDeclarationContext;
+import parser.CminusParser.WhileStmtContext;
 import submit.ast.*;
 
 import java.util.ArrayList;
@@ -170,6 +172,12 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         else if (ctx.compoundStmt() != null){
             return visitCompoundStmt(ctx.compoundStmt());
         }
+        else if (ctx.whileStmt() != null){
+            return visitWhileStmt(ctx.whileStmt());
+        }
+        else if (ctx.breakStmt() != null){
+            return visitBreakStmt(ctx.breakStmt());
+        }
         else return super.visitStatement(ctx);
     }
 
@@ -190,6 +198,17 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         return new CompoundStatement(decls, stmts);
     }
 
+    @Override
+    public Node visitWhileStmt(WhileStmtContext ctx) {
+        Expression simpleExpression = (Expression) visitSimpleExpression(ctx.simpleExpression());
+        Statement statement = (Statement) visitStatement(ctx.statement());
+        return new WhileStmt(simpleExpression, statement);
+    }
+
+    @Override
+    public Node visitBreakStmt(BreakStmtContext ctx) {
+        return new BreakStmt();
+    }
 
     @Override
     public Node visitCall(CallContext ctx) {
@@ -397,7 +416,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         } else { // if (ctx.constant() != null) {
             node = new Immutable((Constant) visitConstant(ctx.constant()));
         }
-        LOGGER.fine("Immutable node: " + node.toString());
+        // LOGGER.fine("Immutable node: " + node.toString());
         return node;
     }
 
@@ -414,12 +433,12 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
             return new Mutable(id, null);
         }
     }
-    // @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
-    // if (ctx.expression() != null) {
-    // return new Return((Expression) visitExpression(ctx.expression()));
-    // }
-    // return new Return(null);
-    // }
+    @Override public Node visitReturnStmt(CminusParser.ReturnStmtContext ctx) {
+    if (ctx.expression() != null) {
+    return new Return((Expression) visitExpression(ctx.expression()));
+    }
+    return new Return(null);
+    }
 
     @Override
     public Node visitConstant(CminusParser.ConstantContext ctx) {
