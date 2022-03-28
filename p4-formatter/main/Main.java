@@ -28,7 +28,7 @@ public class Main {
 
         // TODO Enable trace-level code as needed. When true, LOGGER.fine() statements
         // will be visible.
-        final boolean trace = true;
+        final boolean trace = false;
         if (trace) {
             level = Level.ALL;
         }

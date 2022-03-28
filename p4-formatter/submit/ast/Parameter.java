@@ -11,6 +11,12 @@ public class Parameter implements Declaration {
         this.type = type;
         this.paramId = paramId;
     }
+    public String getId(){
+        return this.paramId;
+    }
+    public VarType getType(){
+        return this.type;
+    }
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix);

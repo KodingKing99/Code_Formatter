@@ -140,16 +140,21 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         else{
             type = FunType.VOID;
         }
+        symbolTable.addSymbol(funName, new SymbolInfo(funName, type, true));
+        symbolTable = symbolTable.createChild();
         LOGGER.fine("Type is: " + type.toString());
         List<Parameter> params = new ArrayList<>();
         for (CminusParser.ParamContext pCtx : ctx.param()) {
-            params.add((Parameter) visitParam(pCtx));
+            Parameter param = (Parameter) visitParam(pCtx);
+            params.add(param);
+            symbolTable.addSymbol(param.getId(), new SymbolInfo(param.getId(), param.getType(), false));
         }
         LOGGER.fine("Params are: ");
         for (Parameter parameter : params) {
             LOGGER.fine(parameter.toString());
         }
         Statement statement = (Statement) visitStatement(ctx.statement());
+        symbolTable = symbolTable.getParent();
         return new FunDecleration(type, funName, params, statement, false);
         // return super.visitFunDeclaration(ctx);
     }
@@ -189,8 +194,11 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitCall(CallContext ctx) {
         // TODO Auto-generated method stub
-        LOGGER.fine("Call is: " + ctx.ID().getText());
+        // LOGGER.fine("Call is: " + ctx.ID().getText());
         String id = ctx.ID().getText();
+        if(symbolTable.find(id) == null){
+            LOGGER.warning("Undefined symbol on line " + ctx.getStart().getLine() + ": " + id);
+        }
         List<Expression> exprs = new ArrayList<>();
         for (ExpressionContext exprCtx : ctx.expression()) {
             exprs.add((Expression) visitExpression(exprCtx));
@@ -250,7 +258,6 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, andExpressions);
-            LOGGER.fine("In Or expression. Binary op is: " + bn.toString());
             return new RelExpression(bn);
         } else {
             return new RelExpression(andExpressions.get(0));
@@ -269,7 +276,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
         }
         if (binaryOperatorTypes.size() > 0) {
             BinaryOperator bn = computeBinaryOperator(binaryOperatorTypes, sumExpressions);
-            LOGGER.fine("In And expression. Binary op is: " + bn.toString());
+            // LOGGER.fine("In And expression. Binary op is: " + bn.toString());
             return new RelExpression(bn);
         } else {
             return new RelExpression(sumExpressions.get(0));
@@ -397,6 +404,9 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitMutable(MutableContext ctx) {
         String id = ctx.ID().getText();
+        if(symbolTable.find(id) == null){
+            LOGGER.warning("Undefined symbol on line " + ctx.getStart().getLine() + ": " + id);
+        }
         if (ctx.expression() != null) {
             Node index = visitExpression(ctx.expression());
             return new Mutable(id, (Expression) index);

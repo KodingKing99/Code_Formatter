@@ -18,7 +18,7 @@ public class Assignment implements Expression{
     @Override
     public void toCminus(StringBuilder builder, String prefix) {
 
-        System.out.println("In assignment to cminus. prefix length: " + prefix.length() + " . Mutable is " + this.mutable.toString());
+        // System.out.println("In assignment to cminus. prefix length: " + prefix.length() + " . Mutable is " + this.mutable.toString());
         builder.append(prefix);
         this.mutable.toCminus(builder, prefix);
         

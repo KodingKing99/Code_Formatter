@@ -4,6 +4,7 @@
  */
 package submit;
 
+import submit.ast.FunType;
 import submit.ast.VarType;
 
 /**
@@ -16,16 +17,27 @@ public class SymbolInfo {
   // In the case of a function, type is the return type
   private final VarType type;
   private final boolean function;
-
+  private final FunType funType;
   public SymbolInfo(String id, VarType type, boolean function) {
     this.id = id;
     this.type = type;
     this.function = function;
+    this.funType = null;
+  }
+  public SymbolInfo(String id, FunType type, boolean function){
+    this.id = id;
+    this.funType = type;
+    this.function = function;
+    this.type = null;
   }
 
   @Override
   public String toString() {
-    return "<" + id + ", " + type + '>';
+    if(type != null){
+
+      return "<" + id + ", " + type + '>';
+    }
+    return "<" + id + ", " + funType + ">";
   }
 
 }
