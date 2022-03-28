@@ -7,9 +7,11 @@ package submit.ast;
 public class Parameter implements Declaration {
     private final VarType type;
     private final String paramId;
-    public Parameter(VarType type, String paramId){
+    private final String paramText;
+    public Parameter(VarType type, String paramId, String paramText){
         this.type = type;
         this.paramId = paramId;
+        this.paramText = paramText;
     }
     public String getId(){
         return this.paramId;
@@ -25,10 +27,10 @@ public class Parameter implements Declaration {
     public void toCminus(StringBuilder builder, String prefix) {
         builder.append(prefix);
         builder.append(type.toString()).append(" ");
-        builder.append(paramId);
+        builder.append(paramText);
     }
     @Override
     public String toString(){
-        return type.toString() + " " + paramId;
+        return type.toString() + " " + paramText;
     }
 }

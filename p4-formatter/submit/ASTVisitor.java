@@ -125,8 +125,10 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitParam(ParamContext ctx) {
         VarType paramType = getVarType(ctx.typeSpecifier());
-        String paramId = ctx.paramId().getText();
-        return new Parameter(paramType, paramId);
+        String paramId = ctx.paramId().ID().getText();
+        String paramText = ctx.paramId().getText();
+        // LOGGER.fine("Param id is " + paramId);
+        return new Parameter(paramType, paramId, paramText);
     }
     @Override
     public Node visitFunDeclaration(FunDeclarationContext ctx) {
@@ -151,14 +153,13 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
             params.add(param);
             symbolTable.addSymbol(param.getId(), new SymbolInfo(param.getId(), param.getType(), false));
         }
-        LOGGER.fine("Params are: ");
-        for (Parameter parameter : params) {
-            LOGGER.fine(parameter.toString());
-        }
+        // LOGGER.fine("Params are: ");
+        // for (Parameter parameter : params) {
+        //     LOGGER.fine(parameter.toString());
+        // }
         Statement statement = (Statement) visitStatement(ctx.statement());
         symbolTable = symbolTable.getParent();
         return new FunDecleration(type, funName, params, statement, false);
-        // return super.visitFunDeclaration(ctx);
     }
 
     @Override
@@ -186,6 +187,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
     @Override
     public Node visitCompoundStmt(CompoundStmtContext ctx) {
         // TODO Auto-generated method stub
+        symbolTable = symbolTable.createChild();
         List<VarDeclaration> decls = new ArrayList<>();
         List<Statement> stmts = new ArrayList<>();
         for (VarDeclarationContext declCtx : ctx.varDeclaration()) {
@@ -195,6 +197,7 @@ public class ASTVisitor extends CminusBaseVisitor<Node> {
             stmts.add((Statement) visitStatement(stmtCtx));
         }
         // return super.visitCompoundStmt(ctx);
+        symbolTable = symbolTable.getParent();
         return new CompoundStatement(decls, stmts);
     }
 

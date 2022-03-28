@@ -22,14 +22,14 @@ public class IfStmt implements Statement{
         builder.append(")\n");
         String prefixCopy = prefix;
         if(!this.statements.get(0).isCompound()){
-            prefix += "  ";
+            prefix += " ";
         }
         this.statements.get(0).toCminus(builder, prefix);
         prefix = prefixCopy;
         if(statements.size() == 2){
             builder.append(prefix).append("else\n");
             if(!this.statements.get(1).isCompound()){
-                prefix += "  ";
+                prefix += " ";
             }
             this.statements.get(1).toCminus(builder, prefix);
             prefix = prefixCopy;
