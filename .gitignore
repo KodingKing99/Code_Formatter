@@ -1,1 +1,4 @@
 p4-formatter/.vscode/
+*.DS_Store
+
+*.zip
